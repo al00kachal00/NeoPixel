@@ -1,0 +1,35 @@
+<!-- index.html -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+<script>
+let video;
+const rows = 12;
+const cols = 10;
+let socket;
+
+function setup() {
+  createCanvas(320, 240);
+  video = createCapture(VIDEO);
+  video.size(cols, rows);
+  video.hide();
+  socket = io('http://localhost:3000'); // Adjust to match server address
+}
+
+function draw() {
+  video.loadPixels();
+  let grid = [];
+  for (let y = 0; y < rows; y++) {
+    let row = [];
+    for (let x = 0; x < cols; x++) {
+      let i = (y * cols + x) * 4;
+      let r = video.pixels[i];
+      let g = video.pixels[i + 1];
+      let b = video.pixels[i + 2];
+      row.push([r, g, b]);
+    }
+    grid.push(row);
+  }
+
+  socket.emit('video-grid', grid); // Send data via WebSocket
+}
+</script>
